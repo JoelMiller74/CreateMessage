@@ -1,16 +1,24 @@
 ﻿using System;
 using RabbitMQ.Client;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 class NewTask
 {
     public static void Main(string[] args)
     {
-        var factory = new ConnectionFactory() { HostName = "localhost" };
+        //https://leonidius2010.wordpress.com/2017/09/21/reading-appsettings-in-net-core-2-console-application/
+        IConfiguration config = new ConfigurationBuilder()
+          .AddJsonFile("appsettings.json", true, true)
+          .Build();
+        string RabbitMQHost = config["RabbitMQHost"];
+        string RabbitMQQueueName = config["RabbitMQQueueName"];
+        
+        var factory = new ConnectionFactory() { HostName = RabbitMQHost };
         using(var connection = factory.CreateConnection())
         using(var channel = connection.CreateModel())
         {
-            channel.QueueDeclare(queue: "task_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+            channel.QueueDeclare(queue: RabbitMQQueueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
             var message = GetMessage(args);
             var body = Encoding.UTF8.GetBytes(message);
