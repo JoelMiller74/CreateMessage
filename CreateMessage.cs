@@ -26,7 +26,7 @@ class NewTask
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
 
-            channel.BasicPublish(exchange: "", routingKey: "task_queue", basicProperties: properties, body: body);
+            channel.BasicPublish(exchange: "", routingKey: RabbitMQQueueName, basicProperties: properties, body: body);
             Console.WriteLine(" [x] Sent {0}", message);
         }
 
